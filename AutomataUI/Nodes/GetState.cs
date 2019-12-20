@@ -96,14 +96,14 @@ namespace VVVV.Nodes
             {
                 Initialize();
 
-                StateActive.SliceCount = StatesEnum.IOObject.SliceCount * AutomataUI[0].ActiveStateIndex.SliceCount; //set Slicecount to amount of incoming Automatas
+                StateActive.SliceCount = StatesEnum.IOObject.SliceCount * AutomataUI[0].ActiveStateIndex.Count; //set Slicecount to amount of incoming Automatas
                 FadeInOut.SliceCount = ElapsedStateTime.SliceCount = FIn.SliceCount = FOut.SliceCount = StateActive.SliceCount;
 
                 for (int j = 0; j < StatesEnum.IOObject.SliceCount; j++)
                 {
-                    for (int i = 0; i < AutomataUI[0].ActiveStateIndex.SliceCount; i++) // spreaded
+                    for (int i = 0; i < AutomataUI[0].ActiveStateIndex.Count; i++) // spreaded
                     {
-                        int offset = i + (j * AutomataUI[0].ActiveStateIndex.SliceCount);
+                        int offset = i + (j * AutomataUI[0].ActiveStateIndex.Count);
                         //FLogger.Log(LogType.Debug, Convert.ToString(offset));
 
                         // find out if selected state is active

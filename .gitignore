@@ -7,3 +7,5 @@
 [Tt]humbs.db
 *.DS_Store
 server.pid
+
+.vs/

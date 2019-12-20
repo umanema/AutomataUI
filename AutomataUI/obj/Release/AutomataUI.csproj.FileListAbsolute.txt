@@ -19,3 +19,10 @@ C:\AutomataUI\packs\AutomataUI\nodes\plugins\AutomataUI.dll
 C:\AutomataUI\packs\AutomataUI\nodes\plugins\AutomataUI.pdb
 C:\AutomataUI\AutomataUI\obj\Release\AutomataUI.csprojAssemblyReference.cache
 C:\AutomataUI\AutomataUI\obj\Release\AutomataUI.csproj.CoreCompileInputs.cache
+C:\vvvv\vvvv_beta_39_x64\packs\AutomataUI\nodes\plugins\AutomataUI.dll
+C:\vvvv\vvvv_beta_39_x64\packs\AutomataUI\nodes\plugins\AutomataUI.pdb
+D:\NSYNK\AutomataUI\AutomataUI\obj\Release\AutomataUI.csprojAssemblyReference.cache
+D:\NSYNK\AutomataUI\packs\AutomataUI\nodes\plugins\VL.AutomataUI.dll
+D:\NSYNK\AutomataUI\packs\AutomataUI\nodes\plugins\VL.AutomataUI.pdb
+D:\NSYNK\AutomataUI\AutomataUI\obj\Release\VL.AutomataUI.dll
+D:\NSYNK\AutomataUI\AutomataUI\obj\Release\VL.AutomataUI.pdb

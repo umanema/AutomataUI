@@ -1,6 +1,6 @@
 using System;
-using VVVV.PluginInterfaces.V1;
-using VVVV.PluginInterfaces.V2;
+//using VVVV.PluginInterfaces.V1;
+//using VVVV.PluginInterfaces.V2;
 using System.Collections.Generic;
 using VVVV.Utils.VMath;
 using System.Windows.Forms;
@@ -59,8 +59,12 @@ namespace Automata.Drawing
 
         // selection and region rectangle
         public Rectangle selectionRectangle = new Rectangle(); //multiselection rectangle
-        
 
+
+        #endregion
+
+        #region debug
+        public string debug = "";
         #endregion
 
         // Methoden //
@@ -261,10 +265,10 @@ namespace Automata.Drawing
             int posx = Convert.ToInt16(23 * dpi);
             int posy = Convert.ToInt16(30 * dpi);
 
-            if (fw.ActiveStateIndex.SliceCount > 1)
+            if (fw.ActiveStateIndex.Count > 1)
             {
                 Spreadbuttons.Clear();
-                for (int i = 0; i < fw.ActiveStateIndex.SliceCount; i++)
+                for (int i = 0; i < fw.ActiveStateIndex.Count; i++)
                 {
                     Spreadbuttons.Add(new Rectangle(new Point(i * posx + 10, posy), new Size(size, size)));
                     if (i == fw.ShowSlice[0]) e.Graphics.FillRectangle(OrangeBrush, Spreadbuttons.Last());
@@ -395,7 +399,13 @@ namespace Automata.Drawing
                     PaintSpreadButtons(sender, e); //Paint Buttons to select which spread of Automata u want
                 }
             }
-            catch { }
+            catch (NullReferenceException exc)
+            {
+                var st = new StackTrace(exc, true);
+                var frame = st.GetFrame(0);
+                var line = frame.GetFileLineNumber();
+                debug = "FUCK: " + exc.TargetSite + " caused an exception on line: " + line; 
+            }
         }
 
         public void InitAutomataDrawing()

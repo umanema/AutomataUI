@@ -92,7 +92,7 @@ namespace VVVV.Nodes
 
                 if (AutomataUI[0].regionList.Count > 0)
                 {
-                    RegionActive.SliceCount = RegionEnum.IOObject.SliceCount * AutomataUI[0].ActiveStateIndex.SliceCount; //set Slicecount to amount of incoming Automatas
+                    RegionActive.SliceCount = RegionEnum.IOObject.SliceCount * AutomataUI[0].ActiveStateIndex.Count; //set Slicecount to amount of incoming Automatas
                     ElapsedRegionTime.SliceCount = RegionActive.SliceCount;
 
 
@@ -102,10 +102,10 @@ namespace VVVV.Nodes
 
                         Rectangle thisRegion = AutomataUI[0].regionList[index].Bounds;
 
-                        for (int i = 0; i < AutomataUI[0].ActiveStateIndex.SliceCount; i++) // spreaded
+                        for (int i = 0; i < AutomataUI[0].ActiveStateIndex.Count; i++) // spreaded
                         {
 
-                            int offset = i + (j * AutomataUI[0].ActiveStateIndex.SliceCount);
+                            int offset = i + (j * AutomataUI[0].ActiveStateIndex.Count);
 
                             int stateIndex = AutomataUI[0].ActiveStateIndex[i];
                             Rectangle state = AutomataUI[0].stateList[stateIndex].Bounds;
