@@ -841,7 +841,7 @@
    </BOUNDS>
    <BOUNDS type="Node" left="9870" top="2070" width="0" height="0">
    </BOUNDS>
-   <PIN pinname="Y Input Value" slicecount="1" visible="1" values="1">
+   <PIN pinname="Y Input Value" slicecount="1" visible="1" values="0">
    </PIN>
    <PIN pinname="Units" slicecount="1" values="||">
    </PIN>
@@ -853,7 +853,7 @@
    </PIN>
    <PIN pinname="Descriptive Name" slicecount="1" values="toMenu">
    </PIN>
-   <PIN pinname="X Input Value" slicecount="1" values="1">
+   <PIN pinname="X Input Value" slicecount="1" values="0">
    </PIN>
    </NODE>
    <LINK srcnodeid="146" srcpinname="Y Output Value" dstnodeid="124" dstpinname="toMenu">
@@ -991,6 +991,8 @@
    </BOUNDS>
    <PIN pinname="AutomataUI" visible="1" slicecount="1" values="||">
    </PIN>
+   <PIN pinname="Debug" visible="1">
+   </PIN>
    </NODE>
    <NODE nodename="IOBox (String)" systemname="IOBox (String)" componentmode="InABox" id="171">
    <BOUNDS type="Node" left="8265" top="8745" width="315" height="270">
@@ -1008,4 +1010,20 @@
    <PIN pinname="Size" slicecount="1" values="29">
    </PIN>
    </NODE>
+   <NODE nodename="IOBox (String)" componentmode="InABox" id="172">
+   <BOUNDS type="Box" left="11535" top="9855" width="3450" height="1875">
+   </BOUNDS>
+   <BOUNDS type="Node" left="11535" top="9855" width="0" height="0">
+   </BOUNDS>
+   <PIN pinname="Default" slicecount="1" values="||">
+   </PIN>
+   <PIN pinname="File Mask" slicecount="1" values="||">
+   </PIN>
+   <PIN pinname="Maximum Characters" slicecount="1" values="-1">
+   </PIN>
+   <PIN pinname="Descriptive Name" slicecount="1" values="Debug">
+   </PIN>
+   </NODE>
+   <LINK srcnodeid="169" srcpinname="Debug" dstnodeid="172" dstpinname="Input String">
+   </LINK>
    </PATCH>

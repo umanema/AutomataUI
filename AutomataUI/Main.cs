@@ -136,7 +136,7 @@ namespace VVVV.Nodes
         #endregion variables
 
         #region debug
-        public string debug = "";
+        public string debug = "Init variables";
         #endregion
 
         #region constructor and init
@@ -216,12 +216,12 @@ namespace VVVV.Nodes
             MouseDown += Form1_MouseDown; //mouse down event
             MouseUp += Form1_MouseUp;
 
-            Paint += p.PaintAutomata; //paint event
-
             if (ShowSlice.Count < 1)
             {
                 ShowSlice.Add(0);
             }
+
+            Paint += p.PaintAutomata; //paint event
             p.InitAutomataDrawing(); //setup textalignment, arrows
 
             SetStyle(ControlStyles.ResizeRedraw, true);
@@ -240,14 +240,14 @@ namespace VVVV.Nodes
                     transitionList = Transition.DataDeserializeTransition(TransitionXML);
 
                     if (RegionXML.Length > 3) regionList = AutomataRegion.DataDeserializeRegion(RegionXML);
-                    EnumManager.UpdateEnum(myGUID + "_Regions", regionList[0].Name, regionList.Select(x => x.Name).ToArray());
+                    //EnumManager.UpdateEnum(myGUID + "_Regions", regionList[0].Name, regionList.Select(x => x.Name).ToArray());
                 }
-                catch { FLogger.Log(LogType.Debug, "Loading XML Graph failed!"); }
+                catch { debug = "Loading XML Graph failed!"; }
 
                 //new enum technique
-                EnumManager.UpdateEnum(myGUID + "_States", stateList[0].Name, stateList.Select(x => x.Name).ToArray());
-                EnumManager.UpdateEnum(myGUID + "_Transitions", transitionList[0].Name, transitionList.Select(x => x.Name).Distinct().ToArray());
-                EnumManager.UpdateEnum(myGUID + "_AllTransitions", transitionList[0].Name, transitionList.Select(x => x.Name).ToArray());
+                //EnumManager.UpdateEnum(myGUID + "_States", stateList[0].Name, stateList.Select(x => x.Name).ToArray());
+                //EnumManager.UpdateEnum(myGUID + "_Transitions", transitionList[0].Name, transitionList.Select(x => x.Name).Distinct().ToArray());
+                //EnumManager.UpdateEnum(myGUID + "_AllTransitions", transitionList[0].Name, transitionList.Select(x => x.Name).ToArray());
 
                 //repair relation
                 foreach (Transition transition in transitionList)
@@ -317,7 +317,8 @@ namespace VVVV.Nodes
             // Override Active State by CTRL Mouseclick
             if (e.Button == MouseButtons.Left && Form.ModifierKeys == Keys.Control && hitState != null)
             {
-                ActiveStateIndex[ShowSlice[0]] = TargetStateIndex[ShowSlice[0]] = stateList.IndexOf(hitState);
+                //ActiveStateIndex[ShowSlice[0]] = TargetStateIndex[ShowSlice[0]] = stateList.IndexOf(hitState);
+                ActiveStateIndex[ShowSlice[0]] = TargetStateIndex[ShowSlice[0]] = stateList.FindIndex(_hitState => _hitState.ID.Equals(hitState.ID));
                 ElapsedStateTime[ShowSlice[0]] = TransitionFramesOut[ShowSlice[0]] = 0;
                 this.Invalidate(); //redraw
             }
@@ -325,12 +326,17 @@ namespace VVVV.Nodes
             // Override Active Transition by CTRL Mouseclick
             if (e.Button == MouseButtons.Left && Form.ModifierKeys == Keys.Control && hitTransition != null)
             {
-                TargetStateIndex[ShowSlice[0]] = stateList.IndexOf(hitTransition.endState); // set target state index
-                ActiveStateIndex[ShowSlice[0]] = stateList.IndexOf(hitTransition.startState);
+                //TargetStateIndex[ShowSlice[0]] = stateList.IndexOf(hitTransition.endState); // set target state index
+                TargetStateIndex[ShowSlice[0]] = stateList.FindIndex(_hitTransition => _hitTransition.ID.Equals(hitTransition.endState)); // set target state index
+                //ActiveStateIndex[ShowSlice[0]] = stateList.IndexOf(hitTransition.startState);
+                ActiveStateIndex[ShowSlice[0]] = stateList.FindIndex(_hitTransition => _hitTransition.ID.Equals(hitTransition.startState));
 
 
                 TransitionFramesOut[ShowSlice[0]] = hitTransition.Frames; // get frames of transition
-                TransitionIndex[ShowSlice[0]] = transitionList.IndexOf(hitTransition); //get transition
+                //TransitionIndex[ShowSlice[0]] = transitionList.IndexOf(hitTransition); //get transition
+                TransitionIndex[ShowSlice[0]] = transitionList.FindIndex(_hitTransition => 
+                _hitTransition.endBezierPoint.Equals(hitTransition.endBezierPoint)); //get transition, maybe endBezierPoint is not good for searching
+                
                 ElapsedStateTime[ShowSlice[0]] = 0; // stop ElapsedStateTimer
 
                 FLogger.Log(LogType.Debug, "force transition");
@@ -817,8 +823,6 @@ namespace VVVV.Nodes
                         ElapsedStateTime[ii] = 0; // stop ElapsedStateTimer
                         this.Invalidate(); //redraw
 
-                        debug = TargetStateIndex[ii].ToString();
-
                         break;
                     }
 
@@ -830,7 +834,7 @@ namespace VVVV.Nodes
                         ElapsedStateTime[ii] >= transition.endState.Frames)
                     {
                         //TargetStateIndex[ii] = stateList.IndexOf(transition.startState); // set target state index
-                        TargetStateIndex[ii] = stateList.FindIndex(startState => startState.ID.Equals(transition.startState.ID)); // set target state index
+                        TargetStateIndex[ii] = stateList.FindIndex(_startState => _startState.ID.Equals(transition.startState.ID)); // set target state index
                         TransitionFramesOut[ii] = transition.Frames; // get frames of transition, hier war +1
                         TransitionIndex[ii] = i; //get transition
                         ElapsedStateTime[ii] = 0; // stop ElapsedStateTimer
