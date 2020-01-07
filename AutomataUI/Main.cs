@@ -1,100 +1,59 @@
 ﻿#region usings
 using System;
-using System.ComponentModel.Composition;
-using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
-
-using VVVV.PluginInterfaces.V1;
-using VVVV.PluginInterfaces.V2;
+using System.Windows.Forms;
 
 using Automata.Data;
 using Automata.Drawing;
+using Automata.Enumerations;
 
-
-using VVVV.Core.Logging;
-using System.Diagnostics;
+using VL.Lib.Collections;
 #endregion usings
+
 
 namespace VVVV.Nodes
 {
-    public delegate void Changed(); //delegate type
-    //#region PluginInfo
-    //[PluginInfo(Name = "AutomataUI", Category = "Animation", Help = "Statemachine", Tags = "", AutoEvaluate = true)]
-    //#endregion PluginInfo
-
-
-
-    public class AutomataUI : UserControl, IPluginEvaluate, IPartImportsSatisfiedNotification
+    public class AutomataUI : UserControl, IPartImportsSatisfiedNotification
     {
         #region fields & pins
 
-        [Config("Allow Multiple Connections")]
-        public ISpread<bool> FAllowMultiple;
+        public List<bool> FAllowMultiple;
 
-        //[Input("SpreadCount", MinValue = 1.0, DefaultValue = 1.0)]
-        //public ISpread<int> FSpreadCount;
+        public int FSpreadCount = 0;
+        int prevSpreadCount = 0;
 
-        [Input("Focus Window", IsBang = true, Visibility = PinVisibility.OnlyInspector)]
-        public IDiffSpread<bool> FocusWindow;
+        public List<bool> FocusWindow;
 
-        [Config("StateXML")]
         public string StateXML = "";
 
-        [Config("TransitionXML")]
         public string TransitionXML = "";
 
-        [Config("RegionXML")]
         public string RegionXML = "";
 
-        [Config("TransitionNames")]
-        public IDiffSpread<string> TransitionNames;
+        //public List<string> TransitionNames;
 
-        [Config("Joreg Mode", IsSingle = true, Visibility = PinVisibility.OnlyInspector)]
-        public IDiffSpread<bool> JoregMode;
+        public bool JoregMode = false;
 
-        //[Config("Show Slice", IsSingle = true, Visibility = PinVisibility.OnlyInspector)]
-        public List<int> ShowSlice = new List<int> (); //which slice of automata is shown ?
+        public ObservableCollection<int> ShowSlice = new ObservableCollection<int>(); //which slice of automata is shown ?
 
-        //[Output("Output")]
-        //public List<String> FOutput;
+        public ObservableCollection<int> ActiveStateIndex = new ObservableCollection<int>();
 
-        //[Output("States")]
-        //public List<String> StatesOut;
-
-        [Output("Active State Index")]
-        public List<int> ActiveStateIndex = new List<int>();
-
-        [Output("Target State Index")]
         public List<int> TargetStateIndex = new List<int>();
 
-        [Output("Transitions")]
-        public List<String> TransitionsOut = new List<String>();
+        //public List<int> TransitionTimeSettingOut = new List<int>();
 
-        [Output("Transition Time Settings")]
-        public List<int> TransitionTimeSettingOut = new List<int>();
-
-        [Output("Transition Index")]
         public List<int> TransitionIndex = new List<int>();
 
-        [Output("Transition Time")]
         public List<int> TransitionFramesOut = new List<int>();
 
-        [Output("Elapsed State Time")]
         public List<int> ElapsedStateTime = new List<int>();
-
-        //[Output("AutomataUI")]
-        //public ISpread<AutomataUI> AutomataUIOut;
-
-        [Import()]
-        public ILogger FLogger;
-        [Import()]
-        public IIOFactory FIOFactory;
-        [Import()]
-        IPluginHost FHost;
 
         #endregion fields & pins
 
@@ -119,32 +78,43 @@ namespace VVVV.Nodes
         public State targetConnectionState = null;
 
         public string EnumName = "";
-        public InputAttribute attr;
+        //public InputAttribute attr;
 
         public PaintAutomataClass p = new PaintAutomataClass(); // create AutomataPaint Object
 
         private bool Initialize = true;
 
-        string dragState = null;
+        private string dragState = null;
 
         public string myGUID = Guid.NewGuid().ToString();
 
         public string licenseOwner = "Automata UI ";
 
-        Dictionary<string, IIOContainer> FPins = new Dictionary<string, IIOContainer>(); //dynamic pins
+        //Dictionary<string, IIOContainer> FPins = new Dictionary<string, IIOContainer>(); //dynamic pins
 
         #endregion variables
 
-        #region debug
+        #region Debug
         public string debug = "Init variables";
         #endregion
 
-        #region constructor and init
+        #region Events
+        void onSliceChange(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            this.Invalidate();
+        }
 
+        void BindEvents()
+        {
+            // redraw if you want to see another slice of automata
+            ShowSlice.CollectionChanged += onSliceChange;
+            ActiveStateIndex.CollectionChanged += onSliceChange;
+        }
+        #endregion
+
+        #region constructor and init
         public void OnImportsSatisfied()
         {
-            //TransitionNames.Changed += HandleTransitionPins;
-
             ///
             /// Getting File Version
             ///
@@ -153,57 +123,11 @@ namespace VVVV.Nodes
             licenseOwner += fvi.FileVersion;
         }
 
-        //private void HandleTransitionPins(IDiffSpread<string> sender)
-        //{
-        //    //FLogger.Log(LogType.Debug, "Update Pins");
-
-        //    // CREATE INIT
-        //    if (stateList.Count == 0)
-        //    {
-        //        stateList.Add(new State()
-        //        {
-        //            ID = "Init",
-        //            Name = "Init",
-        //            Bounds = new Rectangle(new Point(0, 0), new Size(p.StateSize, p.StateSize))
-        //        });
-        //    }
-
-        //    //delete pins which are not in the new list
-        //    foreach (var name in FPins.Keys)
-        //        if (TransitionNames.IndexOf(name) == -1)
-        //            FPins[name].Dispose();
-
-        //    Dictionary<string, IIOContainer> newPins = new Dictionary<string, IIOContainer>();
-        //    foreach (var name in TransitionNames)
-        //    {
-        //        if (!string.IsNullOrEmpty(name)) //ignore empty slices
-        //        {
-        //            if (FPins.ContainsKey(name)) //pin already exists, copy to new dict
-        //            {
-        //                newPins.Add(name, FPins[name]);
-        //                FPins.Remove(name);
-        //            }
-        //            else if (!newPins.ContainsKey(name)) //just checking in case of duplicate names
-        //            {
-        //                var attr = new InputAttribute(name);
-        //                attr.IsBang = true;
-        //                var type = typeof(IDiffSpread<bool>);
-        //                var container = FIOFactory.CreateIOContainer(type, attr);
-        //                newPins.Add(name, container);
-        //            }
-        //        }
-        //    }
-
-        //    //FPins now only holds disposed IIOContainers, since we copied the reusable ones to newPins
-        //    FPins = newPins;
-
-        //}
-
         public AutomataUI()
         {
             //setup the gui
             InitializeComponent();
-
+            BindEvents();
         }
 
         void InitializeComponent()
@@ -240,13 +164,17 @@ namespace VVVV.Nodes
                     transitionList = Transition.DataDeserializeTransition(TransitionXML);
 
                     if (RegionXML.Length > 3) regionList = AutomataRegion.DataDeserializeRegion(RegionXML);
-                    //EnumManager.UpdateEnum(myGUID + "_Regions", regionList[0].Name, regionList.Select(x => x.Name).ToArray());
                 }
                 catch { debug = "Loading XML Graph failed!"; }
 
                 //new enum technique
                 //EnumManager.UpdateEnum(myGUID + "_States", stateList[0].Name, stateList.Select(x => x.Name).ToArray());
+                stateList.ForEach(state => StatesEnum.AddEntry(state.Name));
                 //EnumManager.UpdateEnum(myGUID + "_Transitions", transitionList[0].Name, transitionList.Select(x => x.Name).Distinct().ToArray());
+                transitionList.ForEach(transition => TransitionsEnum.AddEntry(transition.Name));
+                //EnumManager.UpdateEnum(myGUID + "_Regions", regionList[0].Name, regionList.Select(x => x.Name).ToArray());
+                regionList.ForEach(region => RegionsEnum.AddEntry(region.Name));
+
                 //EnumManager.UpdateEnum(myGUID + "_AllTransitions", transitionList[0].Name, transitionList.Select(x => x.Name).ToArray());
 
                 //repair relation
@@ -261,9 +189,13 @@ namespace VVVV.Nodes
                 p.StagePos.X = 0;
                 p.StagePos.Y = 0;
 
-                //UpdateOutputs(); //update State and Transition Outputs
                 Initialize = false;
             }
+        }
+
+        public void TestEnum(TransitionsEnum transitionsEnum, StatesEnum statesEnum, RegionsEnum regionsEnum)
+        {
+            
         }
 
         #endregion constructor and init
@@ -339,7 +271,8 @@ namespace VVVV.Nodes
                 
                 ElapsedStateTime[ShowSlice[0]] = 0; // stop ElapsedStateTimer
 
-                FLogger.Log(LogType.Debug, "force transition");
+                //FLogger.Log(LogType.Debug, "force transition");
+
                 this.Invalidate(); //redraw
             }
 
@@ -556,7 +489,6 @@ namespace VVVV.Nodes
                         });
                         //update config
                         UpdateTransitionConfigs();
-                        //UpdateOutputs();
                     }
                 }
             }
@@ -580,7 +512,6 @@ namespace VVVV.Nodes
 
                 //update transition config
                 UpdateTransitionConfigs();
-                //UpdateOutputs();
             }
         }
 
@@ -590,7 +521,6 @@ namespace VVVV.Nodes
             p.bezierEdit.HighlightTransitionIndex = null;
             p.bezierEdit.highlightTransition = null;
             UpdateTransitionConfigs();
-            //UpdateOutputs();
         }
 
         private void AddState(string input)
@@ -608,7 +538,6 @@ namespace VVVV.Nodes
                 });
 
                 UpdateStateConfigs(); // update JSON,Enums and Redraw
-                //UpdateOutputs();
             }
         }
 
@@ -624,7 +553,6 @@ namespace VVVV.Nodes
                     state.Name = UppercaseFirst(input);
                     state.Frames = frames;
                     UpdateStateConfigs(); // update JSON,Enums and Redraw
-                    //UpdateOutputs();
                 }
             }
         }
@@ -648,66 +576,56 @@ namespace VVVV.Nodes
 
             UpdateStateConfigs(); // update JSON,Enums and Redraw
             UpdateTransitionConfigs();
-            //UpdateOutputs();
         }
 
         private void UpdateTransitionConfigs()
         {
+            debug = "Enter Update Transition Configs";
             // Update Config Pin if there is a change
-
             TransitionXML = Transition.DataSerializeTransition(transitionList);
-            TransitionTimeSettingOut.Clear();
-            TransitionNames.SliceCount = 0;
-            //TransitionNames.Add("Reset To Default State"); // Default Reset Transition to Init
-            foreach (Transition transition in transitionList) // Loop through List with foreach.
-            {
-                TransitionNames.Add(transition.Name);
-                TransitionTimeSettingOut.Add(transition.Frames);
-            }
+            //TransitionTimeSettingOut.Clear();
 
-            if(transitionList.Count > 0)
-            {
-                //new enum technique
-                EnumManager.UpdateEnum(myGUID + "_Transitions", transitionList[0].Name, transitionList.Select(x => x.Name).Distinct().ToArray());
-                EnumManager.UpdateEnum(myGUID + "_AllTransitions", transitionList[0].Name, transitionList.Select(x => x.Name).ToArray());
-            } else
-            {
-                //EnumManager.UpdateEnum(myGUID + "_Transitions", "", transitionList.Select(x => x.Name).Distinct().ToArray());
-                //EnumManager.UpdateEnum(myGUID + "_AllTransitions", "", transitionList.Select(x => x.Name).ToArray());
-            }
-            
+            //TransitionNames.Add("Reset To Default State"); // Default Reset Transition to Init
+            //foreach (Transition transition in transitionList) // Loop through List with foreach.
+            //{
+            //    TransitionNames.Add(transition.Name);
+            //    TransitionTimeSettingOut.Add(transition.Frames);
+            //}
+
+            debug = "Prepare for Transitions Enum Clearing";
+
+            TransitionsEnum.Clear();
+            transitionList.ForEach(transition => TransitionsEnum.AddEntry(transition.Name));
+            debug = transitionList.Count.ToString();
+
+            //upper part seems to be clearer
+
+            //if (transitionList.Count > 0)
+            //{
+            //    //new enum technique
+            //    //EnumManager.UpdateEnum(myGUID + "_Transitions", transitionList[0].Name, transitionList.Select(x => x.Name).Distinct().ToArray());
+            //    //EnumManager.UpdateEnum(myGUID + "_AllTransitions", transitionList[0].Name, transitionList.Select(x => x.Name).ToArray());
+            //} else
+            //{
+            //    //EnumManager.UpdateEnum(myGUID + "_Transitions", "", transitionList.Select(x => x.Name).Distinct().ToArray());
+            //    //EnumManager.UpdateEnum(myGUID + "_AllTransitions", "", transitionList.Select(x => x.Name).ToArray());
+            //}
+
         }
 
         private void UpdateStateConfigs()
         {
             this.Invalidate();
             //update Default State Enum
-            EnumManager.UpdateEnum(EnumName, stateList[0].Name, stateList.Select(x => x.Name).ToArray());
+            //EnumManager.UpdateEnum(EnumName, stateList[0].Name, stateList.Select(x => x.Name).ToArray());
             StateXML = State.DataSerializeState(stateList); //save config
 
             //new enum technique
-            EnumManager.UpdateEnum(myGUID + "_States", stateList[0].Name, stateList.Select(x => x.Name).ToArray());
-            FLogger.Log(LogType.Debug, "update enums state");
+            //EnumManager.UpdateEnum(myGUID + "_States", stateList[0].Name, stateList.Select(x => x.Name).ToArray());
+            StatesEnum.Clear();
+            stateList.ForEach(state => StatesEnum.AddEntry(state.Name));
+            //FLogger.Log(LogType.Debug, "update enums state");
         }
-
-        //private void UpdateOutputs()
-        //{
-        //    StatesOut.SliceCount = 0;
-        //    foreach (State state in stateList) // Loop through List with foreach.
-        //    {
-        //        StatesOut.Add(state.Name);
-        //    }
-
-
-        //    TransitionTimeSettingOut.SliceCount = 0;
-        //    TransitionsOut.SliceCount = 0;
-        //    foreach (Transition transition in transitionList) // Loop through List with foreach.
-        //    {
-        //        TransitionsOut.Add(transition.Name);
-        //        TransitionTimeSettingOut.Add(transition.Frames);
-        //    }
-        //    TransitionsOut.Add("∅");
-        //}
 
         public void SetSelectionRectangle(System.Windows.Forms.MouseEventArgs e)
         {
@@ -749,17 +667,21 @@ namespace VVVV.Nodes
         {
             // Update Config Pin if there is a change
 
+
+
             if (regionList.Count > 0)
             {
                 RegionXML = AutomataRegion.DataSerializeRegion(regionList);
-                EnumManager.UpdateEnum(myGUID + "_Regions", regionList[0].Name, regionList.Select(x => x.Name).ToArray());
+                //EnumManager.UpdateEnum(myGUID + "_Regions", regionList[0].Name, regionList.Select(x => x.Name).ToArray());
+                RegionsEnum.Clear();
+                regionList.ForEach(region => RegionsEnum.AddEntry(region.Name));
             }
                            
             else
             {
                 RegionXML = "";
                 //EnumManager.UpdateEnum(myGUID + "_Regions", "", regionList.Select(x => x.Name).ToArray());
-                
+                RegionsEnum.Clear();
             }
 
         }
@@ -793,8 +715,6 @@ namespace VVVV.Nodes
         public void TriggerTransition(string TransitionName, int ii, int ResetStateIndex)
         {
             //FLogger.Log(LogType.Debug,pin.ToString());
-            //UpdateOutputs(); // output all States and Transitions
-
             if (TransitionName == "Reset To Default State") // Reset to Init State
             {
 
@@ -862,70 +782,79 @@ namespace VVVV.Nodes
         {
             InitSettings(); // Load previous setting and setup certain variables
 
-            //if (FSpreadCount[0] <= 0) FSpreadCount[0] = 1;
-            if (ActiveStateIndex.Count < 1)
+            if (FSpreadCount <= 0) FSpreadCount = 1;
+            if (FSpreadCount > prevSpreadCount)
             {
-                ActiveStateIndex.Add(0);
-                TargetStateIndex.Add(0);
-                TransitionIndex.Add(0);
-                TransitionFramesOut.Add(0);
-                ElapsedStateTime.Add(0);
+                for (int i = 0; i < FSpreadCount - prevSpreadCount; i++)
+                {
+                    ActiveStateIndex.Add(0);
+                    TargetStateIndex.Add(0);
+                    TransitionIndex.Add(0);
+                    TransitionFramesOut.Add(0);
+                    ElapsedStateTime.Add(0);
+                }
+                prevSpreadCount = FSpreadCount;
             }
-            
-                //= FOutput.SliceCount = 1; //make spreadable , set Spreadmax
+            else if (FSpreadCount < prevSpreadCount)
+            {
+                for (int i = prevSpreadCount; i > FSpreadCount; i--)
+                {
+                    ActiveStateIndex.RemoveAt(i - 1);
+                    TargetStateIndex.RemoveAt(i - 1);
+                    TransitionIndex.RemoveAt(i - 1);
+                    TransitionFramesOut.RemoveAt(i - 1);
+                    ElapsedStateTime.RemoveAt(i - 1);
+                }
+                prevSpreadCount = FSpreadCount;
 
-            #region TriggerTransitions
-            //for (int ii = 0; ii < FSpreadCount[0]; ii++) //spreadable loop 01
+            }
+
+            //need to rewrite that part on VL side?
+
+            //#region TriggerTransitions
+            //for (int ii = 0; ii < FSpreadCount; ii++) //spreadable loop 01
             //{
-            int ii = 0;
-                //foreach (var pin in FPins)
-                //{
-                //    var diffpin = pin.Value.RawIOObject as IDiffSpread<bool>;
-                //    if (diffpin[ii] == true && diffpin.SliceCount != 0) //diffpin.IsChanged && JONAS WUNSCHKONZERT
-                //    {
-                //        TriggerTransition(pin.Key, ii, 0);
-                //    }
-                //}
+            //    foreach (var pin in FPins)
+            //    {
+            //        var diffpin = pin.Value.RawIOObject as IDiffSpread<bool>;
+            //        if (diffpin[ii] == true && diffpin.SliceCount != 0) //diffpin.IsChanged && JONAS WUNSCHKONZERT
+            //        {
+            //            TriggerTransition(pin.Key, ii, 0);
+            //        }
+            //    }
             //}
-            #endregion TriggerTransitions
+            //#endregion TriggerTransitions
 
             #region TimingAndIndices
 
-            //for (int ii = 0; ii < FSpreadCount[0]; ii++) //spreadable loop 02
-            //{
+            for (int ii = 0; ii < FSpreadCount; ii++) //spreadable loop 02
+            {
                 // set active Transition,State and Timers 
 
                 if (ActiveStateIndex[ii] != TargetStateIndex[ii] && TransitionFramesOut[ii] != 0) // solange target und active ungleich sind, läuft die transitions
                 {
                     TransitionFramesOut[ii] -= 1; // run Transition Timer 
-                    //FOutput[ii] = TransitionsOut[TransitionIndex[ii]]; //set summarized output to transition
+                    
                 }
-                //else FOutput[ii] = StatesOut[ActiveStateIndex[ii]]; // set summarized output to state
 
                 //passiert nur einmal
                 if (TransitionFramesOut[ii] == 0 && ElapsedStateTime[ii] == 0) //solange transition time und elapsedtime 0 sind, setze target und active gleich
                 {
                     ActiveStateIndex[ii] = TargetStateIndex[ii]; // after transition set activestate to targetstate
-                    TransitionIndex[ii] = TransitionsOut.Count - 1;
+                    TransitionIndex[ii] = transitionList.Count - 1;
                     this.Invalidate(); //redraw
-                    //FLogger.Log(LogType.Debug, "Transition Ends");
+                    
                 }
 
+                //FLogger.Log(LogType.Debug, "Transition Ends");
+
                 if (TransitionFramesOut[ii] == 0) ElapsedStateTime[ii] += 1; // Run State Timer when TransitionTimer is 0
-            //}
+            }
 
-            //if (JoregMode.IsChanged && JoregMode[0]) p.JoregMode(this, true);   //Joreg Mode
-            //else if (JoregMode.IsChanged && !JoregMode[0]) p.JoregMode(this, false);
-
-            //if (ShowSlice.IsChanged || ActiveStateIndex.IsChanged) this.Invalidate(); // redraw if you want to see another slice of automata
+            if (JoregMode) p.JoregMode(this, true);   //Joreg Mode
+            else if (!JoregMode) p.JoregMode(this, false);
 
             #endregion TimingAndIndices
-
-            // set output for additional nodes
-            //AutomataUIOut.SliceCount = 1;
-            //AutomataUIOut[0] = this;
-
-            //if (FocusWindow[0] && FocusWindow.IsChanged) this.Focus(); //bring window to front
         }
     }
 }
