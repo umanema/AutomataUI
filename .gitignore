@@ -1,7 +1,7 @@
 *~.xml
 *_dynamic_.*.dll
 *_dynamic_.*.pdb
-
+*.pdb
 
 #OS junk files
 [Tt]humbs.db
@@ -9,3 +9,5 @@
 server.pid
 
 .vs/
+
+/packs
