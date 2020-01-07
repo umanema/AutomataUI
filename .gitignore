@@ -6,12 +6,12 @@
 .vs/
 *.pdb
 *.[Cc]ache
+[Rr]elease/
+[Dd]ebug/
+[Oo]bj/
 
 #OS junk files
 [Tt]humbs.db
 *.DS_Store
 server.pid
 
-
-
-/packs
