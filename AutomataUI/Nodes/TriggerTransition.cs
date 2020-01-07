@@ -91,7 +91,7 @@ namespace VVVV.Nodes
                 Initialize();
                 for (int i = 0; i < FTrigger.SliceCount; i++)
                 {
-                    if (FTrigger[i]) AutomataUI[0].TriggerTransition(TransitionEnum.IOObject[i].Name, i,0);
+                    //if (FTrigger[i]) AutomataUI[0].TriggerTransition(TransitionEnum.IOObject[i].Name, i,0);
                 }
             }
         }

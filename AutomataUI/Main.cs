@@ -95,7 +95,7 @@ namespace VVVV.Nodes
         #endregion variables
 
         #region Debug
-        public string debug = "Init variables";
+        public string debug = "Initialize variables";
         #endregion
 
         #region Events
@@ -112,7 +112,7 @@ namespace VVVV.Nodes
         }
         #endregion
 
-        #region constructor and init
+        #region Constructor and initialisation
         public void OnImportsSatisfied()
         {
             ///
@@ -192,15 +192,9 @@ namespace VVVV.Nodes
                 Initialize = false;
             }
         }
-
-        public void TestEnum(TransitionsEnum transitionsEnum, StatesEnum statesEnum, RegionsEnum regionsEnum)
-        {
-            
-        }
-
         #endregion constructor and init
 
-        #region mouse    
+        #region mouse
 
         private void Form1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
@@ -583,8 +577,9 @@ namespace VVVV.Nodes
             debug = "Enter Update Transition Configs";
             // Update Config Pin if there is a change
             TransitionXML = Transition.DataSerializeTransition(transitionList);
+            
+            //unnecessary elements 
             //TransitionTimeSettingOut.Clear();
-
             //TransitionNames.Add("Reset To Default State"); // Default Reset Transition to Init
             //foreach (Transition transition in transitionList) // Loop through List with foreach.
             //{
@@ -712,10 +707,11 @@ namespace VVVV.Nodes
 
         #endregion Management
 
-        public void TriggerTransition(string TransitionName, int ii, int ResetStateIndex)
+        public void TriggerTransition(int ii, int ResetStateIndex, TransitionsEnum transitionsEnum)
         {
             //FLogger.Log(LogType.Debug,pin.ToString());
-            if (TransitionName == "Reset To Default State") // Reset to Init State
+            if (transitionsEnum.Value == "Reset To Default State")
+            //if (TransitionName == "Reset To Default State") // Reset to Init State
             {
 
                 // Get Enum Index From Default State and Set Active State
@@ -732,7 +728,8 @@ namespace VVVV.Nodes
                 foreach (Transition transition in transitionList)
                 {
                     // standard transitions
-                    if (transition.Name == TransitionName &&
+                    if (transition.Name == transitionsEnum.Value &&
+                    //if (transition.Name == TransitionName &&
                         transition.startState.ID == stateList.ElementAt(ActiveStateIndex[ii]).ID &&
                         TransitionFramesOut[ii] == 0 &&
                         ElapsedStateTime[ii] >= transition.startState.Frames)
@@ -747,7 +744,8 @@ namespace VVVV.Nodes
                     }
 
                     //pingpong transitions - return to startstate , previous test covers transition to targetstate
-                    if (transition.Name == TransitionName &&
+                    if (transition.Name == transitionsEnum.Value &&
+                    //if (transition.Name == TransitionName &&
                         transition.endState.ID == stateList.ElementAt(ActiveStateIndex[ii]).ID &&
                         TransitionFramesOut[ii] == 0 &&
                         transition.IsPingPong &&

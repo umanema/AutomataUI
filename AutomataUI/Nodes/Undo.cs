@@ -120,7 +120,7 @@ namespace VVVV.Nodes
                 {
                     stateIndexHistory.Pop();
 
-                    AutomataUI[0].TriggerTransition("Reset To Default State", 0, stateIndexHistory.Peek());
+                    //AutomataUI[0].TriggerTransition("Reset To Default State", 0, stateIndexHistory.Peek());
 
                     UpdateOutput();
                 }

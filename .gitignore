@@ -15,3 +15,4 @@
 *.DS_Store
 server.pid
 
+/packs/AutomataUI/girlpower/logging.txt

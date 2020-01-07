@@ -91,7 +91,7 @@ namespace VVVV.Nodes
                 Initialize();
                 for (int i = 0; i < FTrigger.SliceCount; i++)
                 {
-                    if (FTrigger[i]) AutomataUI[0].TriggerTransition("Reset To Default State", i, StatesEnum.IOObject[i].Index);
+                    //if (FTrigger[i]) AutomataUI[0].TriggerTransition("Reset To Default State", i, StatesEnum.IOObject[i].Index);
                 }
             }
         }
