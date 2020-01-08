@@ -174,7 +174,6 @@ namespace VVVV.Nodes
                 transitionList.ForEach(transition => TransitionsEnum.AddEntry(transition.Name));
                 //EnumManager.UpdateEnum(myGUID + "_Regions", regionList[0].Name, regionList.Select(x => x.Name).ToArray());
                 regionList.ForEach(region => RegionsEnum.AddEntry(region.Name));
-
                 //EnumManager.UpdateEnum(myGUID + "_AllTransitions", transitionList[0].Name, transitionList.Select(x => x.Name).ToArray());
 
                 //repair relation
@@ -707,22 +706,31 @@ namespace VVVV.Nodes
 
         #endregion Management
 
+        public void ResetToState (int ii, StatesEnum statesEnum)
+        {
+            ActiveStateIndex[ii] = statesEnum.SelectedIndex();
+            TargetStateIndex[ii] = statesEnum.SelectedIndex();
+            ElapsedStateTime[ii] = 0; // Reset Timer
+            TransitionFramesOut[ii] = 0; // Reset Timer
+            this.Invalidate();
+        }
+
         public void TriggerTransition(int ii, int ResetStateIndex, TransitionsEnum transitionsEnum)
         {
             //FLogger.Log(LogType.Debug,pin.ToString());
-            if (transitionsEnum.Value == "Reset To Default State")
-            //if (TransitionName == "Reset To Default State") // Reset to Init State
-            {
+            //if (transitionsEnum.Value == "Reset To Default State")
+            ////if (TransitionName == "Reset To Default State") // Reset to Init State
+            //{
 
-                // Get Enum Index From Default State and Set Active State
-                ActiveStateIndex[ii] = ResetStateIndex;
-                TargetStateIndex[ii] = ResetStateIndex;
-                ElapsedStateTime[ii] = 0; // Reset Timer
-                TransitionFramesOut[ii] = 0; // Reset Timer
-                this.Invalidate();
-            }
-            else
-            {
+            //    // Get Enum Index From Default State and Set Active State
+            //    ActiveStateIndex[ii] = ResetStateIndex;
+            //    TargetStateIndex[ii] = ResetStateIndex;
+            //    ElapsedStateTime[ii] = 0; // Reset Timer
+            //    TransitionFramesOut[ii] = 0; // Reset Timer
+            //    this.Invalidate();
+            //}
+            //else
+            //{
                 //Find Transition
                 int i = 0;
                 foreach (Transition transition in transitionList)
@@ -762,7 +770,7 @@ namespace VVVV.Nodes
                     }
                     i++;
                 }
-            }
+            //}
         }
 
         static string UppercaseFirst(string s)

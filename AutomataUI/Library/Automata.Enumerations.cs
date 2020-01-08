@@ -72,8 +72,13 @@ namespace Automata.Enumerations
             {
                 StatesEnumDefinition.Instance.AddEntry(entry, null);
             }
-
         }
+
+        public static IReadOnlyList<string> GetEntries()
+        {
+            return StatesEnumDefinition.Instance.Entries;
+        }
+
         public static void Clear()
         {
             StatesEnumDefinition.Instance.Clear();
