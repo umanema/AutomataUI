@@ -706,10 +706,10 @@ namespace VVVV.Nodes
 
         #endregion Management
 
-        public void ResetToState (int ii, StatesEnum statesEnum)
+        public void ResetToState (int ii, int ResetStateIndex)
         {
-            ActiveStateIndex[ii] = statesEnum.SelectedIndex();
-            TargetStateIndex[ii] = statesEnum.SelectedIndex();
+            ActiveStateIndex[ii] = ResetStateIndex;
+            TargetStateIndex[ii] = ResetStateIndex;
             ElapsedStateTime[ii] = 0; // Reset Timer
             TransitionFramesOut[ii] = 0; // Reset Timer
             this.Invalidate();
