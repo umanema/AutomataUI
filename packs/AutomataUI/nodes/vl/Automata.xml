@@ -1,4 +1,68 @@
 ﻿<?xml version="1.0" encoding="utf-16"?>
+<ArrayOfState xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <State>
+    <ID>Init</ID>
+    <Name>Init</Name>
+    <Active>false</Active>
+    <Frames>0</Frames>
+    <Bounds>
+      <Location>
+        <X>164</X>
+        <Y>116</Y>
+      </Location>
+      <Size>
+        <Width>70</Width>
+        <Height>70</Height>
+      </Size>
+      <X>164</X>
+      <Y>116</Y>
+      <Width>70</Width>
+      <Height>70</Height>
+    </Bounds>
+  </State>
+  <State>
+    <ID>3ljphdUh</ID>
+    <Name>Menu</Name>
+    <Active>false</Active>
+    <Frames>1</Frames>
+    <Bounds>
+      <Location>
+        <X>420</X>
+        <Y>124</Y>
+      </Location>
+      <Size>
+        <Width>70</Width>
+        <Height>70</Height>
+      </Size>
+      <X>420</X>
+      <Y>124</Y>
+      <Width>70</Width>
+      <Height>70</Height>
+    </Bounds>
+  </State>
+  <State>
+    <ID>VZEPwLcS</ID>
+    <Name>Submenu</Name>
+    <Active>false</Active>
+    <Frames>0</Frames>
+    <Bounds>
+      <Location>
+        <X>621</X>
+        <Y>304</Y>
+      </Location>
+      <Size>
+        <Width>70</Width>
+        <Height>70</Height>
+      </Size>
+      <X>621</X>
+      <Y>304</Y>
+      <Width>70</Width>
+      <Height>70</Height>
+    </Bounds>
+  </State>
+</ArrayOfState>
+
+<?xml version="1.0" encoding="utf-16"?>
 <ArrayOfTransition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Transition>
     <Name>toMenu</Name>
@@ -202,3 +266,38 @@
     </Bounds>
   </Transition>
 </ArrayOfTransition>
+
+<?xml version="1.0" encoding="utf-16"?>
+<ArrayOfAutomataRegion xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <AutomataRegion>
+    <Name>Region</Name>
+    <Bounds>
+      <Location>
+        <X>372</X>
+        <Y>71</Y>
+      </Location>
+      <Size>
+        <Width>387</Width>
+        <Height>511</Height>
+      </Size>
+      <X>372</X>
+      <Y>71</Y>
+      <Width>387</Width>
+      <Height>511</Height>
+    </Bounds>
+    <SizeHandle>
+      <Location>
+        <X>749</X>
+        <Y>572</Y>
+      </Location>
+      <Size>
+        <Width>10</Width>
+        <Height>10</Height>
+      </Size>
+      <X>749</X>
+      <Y>572</Y>
+      <Width>10</Width>
+      <Height>10</Height>
+    </SizeHandle>
+  </AutomataRegion>
+</ArrayOfAutomataRegion>
