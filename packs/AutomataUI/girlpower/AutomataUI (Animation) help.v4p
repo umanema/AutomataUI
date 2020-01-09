@@ -1,5 +1,5 @@
 <!DOCTYPE PATCH  SYSTEM "http://vvvv.org/versions/vvvv50beta39.dtd" >
-   <PATCH nodename="D:\NSYNK\AutomataUI\packs\AutomataUI\girlpower\AutomataUI (Animation) help.v4p" systemname="AutomataUI (Animation) help2" filename="C:\AutomataUI\AutomataUI\AutomataUI (Animation) help2.v4p" scrollx="0" scrolly="1890" locked="0">
+   <PATCH nodename="D:\NSYNK\AutomataUI\packs\AutomataUI\girlpower\AutomataUI (Animation) help.v4p" systemname="AutomataUI (Animation) help2" filename="C:\AutomataUI\AutomataUI\AutomataUI (Animation) help2.v4p" scrollx="6420" scrolly="6570" locked="0">
    <BOUNDS type="Window" left="1395" top="10050" width="15735" height="10530">
    </BOUNDS>
    <PACK Name="addonpack" Version="39.0.0">
@@ -371,7 +371,7 @@
    </BOUNDS>
    <BOUNDS type="Node" left="17640" top="10245" width="0" height="0">
    </BOUNDS>
-   <PIN pinname="Input Enum" slicecount="1" visible="1" values="toSubmenu">
+   <PIN pinname="Input Enum" slicecount="1" visible="1" values="toMenu">
    </PIN>
    <PIN pinname="Default" slicecount="1" values="dingdong">
    </PIN>

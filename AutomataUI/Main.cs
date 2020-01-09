@@ -82,7 +82,7 @@ namespace VVVV.Nodes
 
         public PaintAutomataClass p = new PaintAutomataClass(); // create AutomataPaint Object
 
-        private bool Initialize = true;
+        public bool Initialize = true;
 
         private string dragState = null;
 
@@ -190,7 +190,28 @@ namespace VVVV.Nodes
 
                 Initialize = false;
             }
+            else if (stateList.Count < 2 && Initialize)
+            {
+                //add state to state list
+                
+                stateList.Add(new State()
+                {
+                    ID = "Init",
+                    Name = "Init",
+                    Bounds = new Rectangle(new Point(0, 0), new Size(p.StateSize, p.StateSize))
+                });
+                
+
+                UpdateStateConfigs(); // update JSON,Enums and Redraw
+                this.Invalidate();
+                previousPosition = MousePosition;
+                p.StagePos.X = 0;
+                p.StagePos.Y = 0;
+
+                Initialize = false;
+            }
         }
+
         #endregion constructor and init
 
         #region mouse
@@ -715,7 +736,7 @@ namespace VVVV.Nodes
             this.Invalidate();
         }
 
-        public void TriggerTransition(int ii, int ResetStateIndex, TransitionsEnum transitionsEnum)
+        public void TriggerTransition(int ii, int ResetStateIndex, string Transition)
         {
             //FLogger.Log(LogType.Debug,pin.ToString());
             //if (transitionsEnum.Value == "Reset To Default State")
@@ -732,44 +753,45 @@ namespace VVVV.Nodes
             //else
             //{
                 //Find Transition
-                int i = 0;
-                foreach (Transition transition in transitionList)
+            
+            int i = 0;
+            foreach (Transition transition in transitionList)
+            {
+                // standard transitions
+                if (transition.Name == Transition &&
+                //if (transition.Name == TransitionName &&
+                    transition.startState.ID == stateList.ElementAt(ActiveStateIndex[ii]).ID &&
+                    TransitionFramesOut[ii] == 0 &&
+                    ElapsedStateTime[ii] >= transition.startState.Frames)
                 {
-                    // standard transitions
-                    if (transition.Name == transitionsEnum.Value &&
-                    //if (transition.Name == TransitionName &&
-                        transition.startState.ID == stateList.ElementAt(ActiveStateIndex[ii]).ID &&
-                        TransitionFramesOut[ii] == 0 &&
-                        ElapsedStateTime[ii] >= transition.startState.Frames)
-                    {
-                        TargetStateIndex[ii] = stateList.FindIndex(endState => endState.ID.Equals(transition.endState.ID)); // set target state index
-                        TransitionFramesOut[ii] = transition.Frames; // get frames of transition
-                        TransitionIndex[ii] = i; //get transition
-                        ElapsedStateTime[ii] = 0; // stop ElapsedStateTimer
-                        this.Invalidate(); //redraw
+                    TargetStateIndex[ii] = stateList.FindIndex(endState => endState.ID.Equals(transition.endState.ID)); // set target state index
+                    TransitionFramesOut[ii] = transition.Frames; // get frames of transition
+                    TransitionIndex[ii] = i; //get transition
+                    ElapsedStateTime[ii] = 0; // stop ElapsedStateTimer
+                    this.Invalidate(); //redraw
 
-                        break;
-                    }
-
-                    //pingpong transitions - return to startstate , previous test covers transition to targetstate
-                    if (transition.Name == transitionsEnum.Value &&
-                    //if (transition.Name == TransitionName &&
-                        transition.endState.ID == stateList.ElementAt(ActiveStateIndex[ii]).ID &&
-                        TransitionFramesOut[ii] == 0 &&
-                        transition.IsPingPong &&
-                        ElapsedStateTime[ii] >= transition.endState.Frames)
-                    {
-                        //TargetStateIndex[ii] = stateList.IndexOf(transition.startState); // set target state index
-                        TargetStateIndex[ii] = stateList.FindIndex(_startState => _startState.ID.Equals(transition.startState.ID)); // set target state index
-                        TransitionFramesOut[ii] = transition.Frames; // get frames of transition, hier war +1
-                        TransitionIndex[ii] = i; //get transition
-                        ElapsedStateTime[ii] = 0; // stop ElapsedStateTimer
-                        this.Invalidate(); //redraw
-
-                        break;
-                    }
-                    i++;
+                    break;
                 }
+
+                //pingpong transitions - return to startstate , previous test covers transition to targetstate
+                if (transition.Name == Transition &&
+                //if (transition.Name == TransitionName &&
+                    transition.endState.ID == stateList.ElementAt(ActiveStateIndex[ii]).ID &&
+                    TransitionFramesOut[ii] == 0 &&
+                    transition.IsPingPong &&
+                    ElapsedStateTime[ii] >= transition.endState.Frames)
+                {
+                    //TargetStateIndex[ii] = stateList.IndexOf(transition.startState); // set target state index
+                    TargetStateIndex[ii] = stateList.FindIndex(_startState => _startState.ID.Equals(transition.startState.ID)); // set target state index
+                    TransitionFramesOut[ii] = transition.Frames; // get frames of transition, hier war +1
+                    TransitionIndex[ii] = i; //get transition
+                    ElapsedStateTime[ii] = 0; // stop ElapsedStateTimer
+                    this.Invalidate(); //redraw
+
+                    break;
+                }
+                i++;
+            }
             //}
         }
 
